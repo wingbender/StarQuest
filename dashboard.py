@@ -46,10 +46,10 @@ for constellation in CONSTELLATIONS:
     ra = constellation['ra_hours'] * 15  # to degrees
     dec = constellation['dec_deg']
     altitudes = []
+    star = Star(ra_hours=ra/15, dec_degrees=dec)
     for t in sky_times:
-        astrometric = position_of_radec(ra_hours=ra/15, dec_degrees=dec).at(t)
         app = eph['earth'] + observer
-        alt, az, dist = app.at(t).observe(astrometric).apparent().altaz()
+        alt, az, dist = app.at(t).observe(star).apparent().altaz()
         altitudes.append(alt.degrees)
     altitudes = np.array(altitudes)
     max_idx = np.argmax(altitudes)
