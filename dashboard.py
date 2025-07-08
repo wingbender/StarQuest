@@ -52,7 +52,7 @@ CONSTELLATIONS = [
     {'name': 'Auriga', 'he_name': 'רכב', 'ra_hours': 5.75, 'dec_deg': 42.0},
     {'name': 'Bootes', 'he_name': 'רועה דובים', 'ra_hours': 15.0, 'dec_deg': 40.0},
     {'name': 'Caelum', 'he_name': 'מפסלת', 'ra_hours': 5.25, 'dec_deg': -42.0},
-    {'name': 'Camelopardalis', 'he_name': 'ג'ירפה', 'ra_hours': 7.0, 'dec_deg': 70.0},
+    {'name': 'Camelopardalis', 'he_name': 'ג'\ירפה', 'ra_hours': 7.0, 'dec_deg': 70.0},
     {'name': 'Cancer', 'he_name': 'סרטן', 'ra_hours': 9.0, 'dec_deg': 22.5},
     {'name': 'Canes Venatici', 'he_name': 'כלבי ציד', 'ra_hours': 13.0, 'dec_deg': 40.0},
     {'name': 'Canis Major', 'he_name': 'כלב גדול', 'ra_hours': 7.0, 'dec_deg': -25.0},
