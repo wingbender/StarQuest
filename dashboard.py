@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from geopy.geocoders import Nominatim
 from skyfield.api import load, Topos
+from skyfield.starlib import Star
 from datetime import datetime, timedelta
 
 # 1. User input
