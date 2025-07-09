@@ -5,6 +5,8 @@ from geopy.geocoders import Nominatim
 from skyfield.api import load, Topos
 from skyfield.starlib import Star
 from datetime import datetime, timedelta
+import plotly.graph_objects as go
+import random
 
 def find_rise_set(times, altitudes):
     above = altitudes > 0
@@ -25,10 +27,14 @@ location_input = st.text_input("Enter your location (city, country)", "Tel Aviv"
 date_input = st.date_input("Choose a date", datetime.now().date())
 
 # 2. Geocode location
-geolocator = Nominatim(user_agent="constellation-dashboard")
-location = geolocator.geocode(location_input)
+@st.cache_data
+def geocode_location(place):
+    geolocator = Nominatim(user_agent="constellation-dashboard", timeout=10)
+    return geolocator.geocode(place)
+
+location = geocode_location(location_input)
 if not location:
-    st.error("Location not found!")
+    st.error("Location not found or geocoding service is temporarily unavailable. Please try again.")
     st.stop()
 
 lat, lon = location.latitude, location.longitude
@@ -166,18 +172,43 @@ for constellation in CONSTELLATIONS:
     })
 
 df = pd.DataFrame(results)
+df['Show on Plot'] = False  # New column for selection
 
 # 6. Table display
 st.subheader(f"Constellations for {location.address} ({lat:.2f}, {lon:.2f})")
-st.dataframe(df[['Constellation', 'שם בעברית', 'Best Hour', 'Rise', 'Set', 'Altitude Now (°)', 'Visible Now']])
+df_editor = st.data_editor(
+    df[['Show on Plot', 'Constellation', 'שם בעברית', 'Best Hour', 'Rise', 'Set', 'Altitude Now (°)', 'Visible Now']],
+    num_rows="dynamic",
+    use_container_width=True,
+    hide_index=True
+)
 
 # 7. Interactive plot
-selected = st.selectbox("Show altitude curve for:", df['Constellation'])
-const_data = df[df['Constellation'] == selected].iloc[0]
-altitudes = const_data['Altitudes']
-plot_times = [t.strftime('%H:%M') for t in const_data['Times']]
+selected_df = df[df_editor['Show on Plot'] == True]
 
-st.line_chart(pd.DataFrame({'Altitude (°)': altitudes}, index=plot_times))
+if not selected_df.empty:
+    fig = go.Figure()
+    for idx, row in selected_df.iterrows():
+        # Random color, but can use a hash for consistent color per constellation if you want
+        color = "#"+''.join(random.choices('0123456789ABCDEF', k=6))
+        times = [t.strftime('%H:%M') for t in row['Times']]
+        fig.add_trace(go.Scatter(
+            x=times,
+            y=row['Altitudes'],
+            mode='lines',
+            name=f"{row['שם בעברית']} ({row['Constellation']})",
+            line=dict(color=color)
+        ))
+    fig.update_layout(
+        xaxis_title="שעה",
+        yaxis_title="גובה מעל האופק (°)",
+        legend_title="קבוצות נבחרות",
+        margin=dict(l=10, r=10, t=30, b=10),
+        height=450
+    )
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.info("סמן קבוצות כוכבים בטבלה להצגה בגרף.")
 
 # 8. Placeholder: Moon phase & light pollution
 st.info("Moon phase and local light pollution: [Coming soon!]")
