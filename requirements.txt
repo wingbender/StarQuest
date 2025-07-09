@@ -5,3 +5,6 @@ geopy
 skyfield
 matplotlib
 plotly
+astral
+timezonefinder 
+pytz
